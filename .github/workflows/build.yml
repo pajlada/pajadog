@@ -17,6 +17,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
+        boost: [0, 1]
       fail-fast: false
 
     steps:
@@ -42,7 +43,7 @@ jobs:
             mkdir build
             cd build
             "C:\Program Files\Conan\conan\conan.exe" install ..
-            cmake ..
+            cmake -DUSE_BOOST_FILESYSTEM=${{matrix.boost}} ..
             cmake --build .
         shell: cmd
 
@@ -70,7 +71,7 @@ jobs:
         run: |
             mkdir build
             cd build
-            cmake -DUSE_BOOST_FILESYSTEM=1 ..
+            cmake -DUSE_BOOST_FILESYSTEM=${{matrix.boost}} ..
             make -j8
         shell: bash
 
