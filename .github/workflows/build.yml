@@ -18,7 +18,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-18.04, macos-latest]
+        os: [windows-latest, ubuntu-latest, macos-latest]
         fs-backend: [std, boost]
         package-manager: [conan, none]
         exclude:
@@ -72,25 +72,14 @@ jobs:
         if: startsWith(matrix.os, 'windows')
         run: |
             call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-            cmake -DUSE_BOOST_FILESYSTEM=${{ steps.filesystem-backend.outputs.use-boost-filesystem }} -DUSE_CONAN=${{ steps.package-manager.outputs.use-conan }} -DBUILD_TESTS=On ..
+            cmake -DPAJLADA_SETTINGS_USE_BOOST_FILESYSTEM=${{ steps.filesystem-backend.outputs.use-boost-filesystem }} -DPAJLADA_SETTINGS_USE_CONAN=${{ steps.package-manager.outputs.use-conan }} -DPAJLADA_SETTINGS_BUILD_TESTS=On ..
             cmake --build . --config Release
         shell: cmd
         working-directory: build
 
       - name: Install dependencies (Ubuntu)
         if: startsWith(matrix.os, 'ubuntu') && matrix.package-manager == 'none'
-        run: sudo apt-get update && sudo apt-get -y install libboost-dev libboost-system-dev libboost-filesystem-dev rapidjson-dev
-
-      - name: Install GCC 8.3 (Ubuntu)
-        if: startsWith(matrix.os, 'ubuntu')
-        run: sudo add-apt-repository ppa:jonathonf/gcc && sudo apt-get update && sudo apt-get -y install gcc-8
-
-      - name: Prepare GCC version (Ubuntu)
-        if: startsWith(matrix.os, 'ubuntu')
-        run: |
-            echo "CC=/usr/bin/gcc-8" >> "$GITHUB_ENV"
-            echo "CXX=/usr/bin/g++-8" >> "$GITHUB_ENV"
-        shell: bash
+        run: sudo apt-get update && sudo apt-get -y install gcc libboost-dev libboost-system-dev libboost-filesystem-dev rapidjson-dev
 
       - name: Install dependencies (MacOS)
         if: startsWith(matrix.os, 'macos') && matrix.package-manager == 'none'
@@ -127,9 +116,9 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')
         run: |
             cmake \
-                -DUSE_BOOST_FILESYSTEM=${{ steps.filesystem-backend.outputs.use-boost-filesystem }} \
-                -DUSE_CONAN=${{ steps.package-manager.outputs.use-conan }} \
-                -DBUILD_TESTS=On \
+                -DPAJLADA_SETTINGS_USE_BOOST_FILESYSTEM=${{ steps.filesystem-backend.outputs.use-boost-filesystem }} \
+                -DPAJLADA_SETTINGS_USE_CONAN=${{ steps.package-manager.outputs.use-conan }} \
+                -DPAJLADA_SETTINGS_BUILD_TESTS=On \
                 ..
             make -j8
         shell: bash
